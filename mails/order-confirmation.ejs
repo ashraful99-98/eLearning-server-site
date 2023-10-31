@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Order Confirmation</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background-color: #007BFF;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+
+        .order-details {
+            padding: 20px;
+        }
+
+        .order-details h1 {
+            font-size: 24px;
+            color: #333;
+        }
+
+        .order-details p {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .order-details table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .order-details th,
+        .order-details td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        .order-details th {
+            background-color: #007BFF;
+            color: #fff;
+        }
+
+        .order-details td {
+            background-color: #f4f4f4;
+        }
+
+        .order-details .total {
+            font-weight: bold;
+        }
+
+        .footer {
+            background-color: #f4f4f4;
+            padding: 10px;
+            text-align: center;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Your ELearning Order is Confirmed!</h1>
+            <p>And we're just as excited as you are.</p>
+        </div>
+        <div class="order-details">
+            <p>Here's what you ordered:</p>
+             <h2>Order Details:</h2>
+            <p><strong>Order #: <%= order._id %></strong></p>
+            <p><strong>Order Date:</strong> <%= order.date %></p>
+
+            <table>
+                <tr>
+                    <th>Item</th>
+                    <th>Qty</th>
+                    <th>Cost</th>
+                </tr>
+                <tr>
+                    <td><%= order.name %></td>
+                    <td>1</td>
+                    <td><%= order.price %></td>
+                </tr>
+            </table>
+
+            <table>
+                <tr>
+                    <td class="total" colspan="2">Subtotal:</td>
+                    <td class="total"><%= order.price %></td>
+                </tr>
+                <tr>
+                    <td class="total" colspan="2">Total:</td>
+                    <td class="total"><%= order.price %></td>
+                </tr>
+            </table>
+        </div>
+        <div class="footer">
+            <p>If you have any questions, please contact our support team at <a href="mailto:support@elearning.com">support@ELearning.com</a></p>
+            <p>&copy; 2023 ELearning. All rights reserved</p>
+        </div>
+    </div>
+</body>
+
+</html>
