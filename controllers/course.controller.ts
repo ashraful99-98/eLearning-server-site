@@ -1,5 +1,4 @@
 import { NextFunction,Request,Response } from "express";
-
 import { CatchAsyncError } from "../middleware/catchAsyncError";
 import ErrorHandler from "../utils/ErrorHandler";
 import cloudinary from "cloudinary";
@@ -10,6 +9,7 @@ import mongoose from "mongoose";
 import ejs from "ejs";
 import path from "path";
 import sendMail from "../utils/sendMail";
+import NotificationModel from "../models/notificationModel";
 
 // upload course
 export const uploadCourse = CatchAsyncError(async(req:Request, res: Response, next:NextFunction)=>{
@@ -203,6 +203,12 @@ export const addQuestion = CatchAsyncError(async(req:Request, res:Response, next
 
         courseContent.questions.push(newQuestion);
 
+        await NotificationModel.create({
+            user:  req.user?._id,
+            title: "New Question Received",
+            message: `You have a new qstueion in ${courseContent.title}`,
+        });
+
         // save the updated course 
 
         await course?.save();
@@ -278,6 +284,13 @@ export const addAnswer = CatchAsyncError(async(req:Request, res:Response, next:N
         if(req.user?._id === question.user?._id){
 
             // create a notification model 
+
+            await NotificationModel.create({
+                user: req.user?._id,
+                title: "New Question Reply Received",
+                message: `You have a new question reply in ${courseContent?.title}`
+            });
+
 
         }else{
             const data = {
