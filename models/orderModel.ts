@@ -18,7 +18,8 @@ const orderSchema = new Schema<IOrder>({
     },
     payment_info:{
         type:Object,
-        required:false  //  required:true
+        required:false 
+        //   required:true
 
     }
 },{timestamps: true});
