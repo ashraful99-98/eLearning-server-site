@@ -1,6 +1,17 @@
 import { authorizeRoles, isAutheticated } from './../middleware/auth';
 import  express  from "express";
-import { addAnswer, addQuestion, addReplyToReview, addReview, deleteCourse, editCourse, getAllCourses,getAllCoursesControl, getCourseByUser, getSingleCourse, uploadCourse } from "../controllers/course.controller";
+import { addAnswer,
+         addQuestion,
+         addReplyToReview, 
+         addReview, 
+         deleteCourse, 
+         editCourse, 
+         getAllCourses,
+         getAllCoursesControl, 
+         getCourseByUser, 
+         getSingleCourse, 
+         uploadCourse 
+        } from "../controllers/course.controller";
 const courseRouter = express.Router();
 
 
