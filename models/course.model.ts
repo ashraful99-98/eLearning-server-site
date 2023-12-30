@@ -1,14 +1,14 @@
 import mongoose,{Document,Model,Schema} from "mongoose";
-import { Iuser } from "./user.model";
+import { IUser } from "./user.model";
 
 interface IComment extends Document{
-    user: Iuser;
+    user: IUser;
     question: string;
     questionReplies?: IComment[];
 }
 
 interface IReview extends Document{
-    user: Iuser,
+    user: IUser,
     rating: number,
     comment: string,
     commentReplies: IComment[];
