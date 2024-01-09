@@ -38,7 +38,10 @@ courseRouter.get("/get-all-courses",isAutheticated, authorizeRoles("admin"), get
 
 // courseRouter.put("/get-all-courses",isAutheticated, authorizeRoles("admin"), getAllCourses);
 
-
+courseRouter.post(
+        "/getVdoCipherOTP",
+   generateVideoUrl
+);
 
 courseRouter.delete("/delete-course/:id",isAutheticated, authorizeRoles("admin"), deleteCourse);
 
