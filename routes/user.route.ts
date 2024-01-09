@@ -5,14 +5,14 @@ import {
     loginUser, 
     logoutUser, 
     updateAccessToken,
-    getUserInfo, 
     socialAuth, 
     updateUserInfo, 
     updatePassword,
     updateProfilePicture,
     getAllUsers,
     updateUserRole,
-    deleteUser
+    deleteUser,
+    getUserInfo
         } from '../controllers/user.controller';
         
 import { authorizeRoles, isAutheticated } from '../middleware/auth';

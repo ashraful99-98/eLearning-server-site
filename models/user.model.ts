@@ -7,7 +7,7 @@ const emailRegexPattern : RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // const emailRegexPattern: RegExp = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 
-export interface Iuser extends Document{
+export interface IUser extends Document{
     name: string;
     email: string;
     password: string;
@@ -26,7 +26,7 @@ export interface Iuser extends Document{
 
 };
 
-const userSchema : Schema<Iuser> = new mongoose.Schema({
+export const userSchema : Schema<IUser> = new mongoose.Schema({
     name:{
         type:String,
         required:[true, "Please enter your name"],
@@ -54,6 +54,7 @@ const userSchema : Schema<Iuser> = new mongoose.Schema({
     role:{
         type:String,
         default: "user",
+        // default: "User",
     },
     isVerified:{
         type:Boolean,
@@ -70,7 +71,7 @@ const userSchema : Schema<Iuser> = new mongoose.Schema({
 },{timestamps:true}); 
 
 //Hash Password before saving 
-userSchema.pre<Iuser>('save', async function(next){
+userSchema.pre<IUser>('save', async function(next){
 
     if(!this.isModified('password')){
        next();
@@ -99,6 +100,6 @@ userSchema.methods.comparePassword = async function(enteredPassword: string): Pr
 return await bcrypt.compare(enteredPassword, this.password);
 };
 
-const userModel : Model<Iuser> = mongoose.model("user", userSchema);
+const userModel : Model<IUser> = mongoose.model("User", userSchema);
 
 export default userModel;

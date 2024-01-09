@@ -1,7 +1,7 @@
-import { accessTokenOptions, refreshTokenOptions } from './../utils/jwt';
 require('dotenv').config();
+import { accessTokenOptions, refreshTokenOptions } from './../utils/jwt';
 import { Request, Response, NextFunction } from "express";
-import userModel, { Iuser } from "../models/user.model";
+import userModel, { IUser } from "../models/user.model";
 import ErrorHandler from "../utils/ErrorHandler";
 import { CatchAsyncError } from "../middleware/catchAsyncError";
 import jwt, { JwtPayload, Secret } from "jsonwebtoken";
@@ -103,10 +103,10 @@ export const activateUser = CatchAsyncError(async (req: Request, res: Response, 
     try {
         const { activation_token, activation_code } = req.body as IActivationRequest;
 
-        const newUser: { user: Iuser; activationCode: string } = jwt.verify(
+        const newUser: { user: IUser; activationCode: string } = jwt.verify(
             activation_token,
             process.env.ACTIVATION_SECRET as string
-        ) as { user: Iuser; activationCode: string };
+        ) as { user: IUser; activationCode: string };
 
         if (newUser.activationCode !== activation_code) {
             return next(new ErrorHandler("Invalid activation code", 400));
@@ -175,8 +175,8 @@ export const logoutUser = CatchAsyncError(async (req: Request, res: Response, ne
         res.cookie("access_token", "", { maxAge: 1 });
         res.cookie("refresh_token", "", { maxAge: 1 });
 
-        const userId = req.user?._id || "";
-        redis.del(userId);
+        // const userId = req.user?._id || "";
+        // redis.del(userId);
 
         res.status(200).json({
             success: true,
@@ -188,7 +188,7 @@ export const logoutUser = CatchAsyncError(async (req: Request, res: Response, ne
         return next(new ErrorHandler(error.message, 400));
     }
 
-});
+}); 
 
 // update access token and refresh  
 export const updateAccessToken = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
@@ -240,26 +240,30 @@ export const updateAccessToken = CatchAsyncError(async (req: Request, res: Respo
 });
 
 // get user info 
-export const getUserInfo = CatchAsyncError(async (res: Response, req: Request, next: NextFunction) => {
-    try {
+export const getUserInfo= CatchAsyncError(async(req:Request, res:Response, next:NextFunction)=>{
+    try{
+
         const userId = req.user?._id;
-        getUserById(userId, res);
+
+        getUserById(userId,res);
+
+  
 
     } catch (error: any) {
         return next(new ErrorHandler(error.message, 400));
     }
-});
+})
 
 // social auth 
-interface iSocialAuthBody {
+interface ISocialAuthBody {
     email: string;
     name: string;
     avatar: string;
 }
 
-export const socialAuth = CatchAsyncError(async (res: Response, req: Request, next: NextFunction) => {
+export const socialAuth = CatchAsyncError(async ( req: Request,res:Response, next: NextFunction) => {
     try {
-        const { email, name, avatar } = req.body as iSocialAuthBody;
+        const { email, name, avatar } = req.body as ISocialAuthBody;
         const user = await userModel.findOne({ email });
         if (!user) {
             const newUser = await userModel.create({ email, name, avatar });
@@ -285,20 +289,12 @@ interface IUpdateUserInfo {
 export const updateUserInfo = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     try {
 
-        const { name, email } = req.body as IUpdateUserInfo;
+        const { name} = req.body as IUpdateUserInfo;
 
         const userId = req.user?._id;
 
         const user = await userModel.findById(userId);
 
-        if (email && user) {
-            const isEmailExist = await userModel.findOne({ email });
-
-            if (isEmailExist) {
-                return next(new ErrorHandler("Email already exist", 400));
-            }
-            user.email = email;
-        }
 
         if (name && user) {
             user.name = name;
@@ -310,8 +306,8 @@ export const updateUserInfo = CatchAsyncError(async (req: Request, res: Response
 
         res.status(201).json({
             success: true,
-            user,
-        });
+           user,
+        }); 
 
 
     } catch (error: any) {
@@ -335,7 +331,7 @@ export const updatePassword = CatchAsyncError(async (req: Request, res: Response
         if (!oldPassword || !newPassword) {
             return next(new ErrorHandler("Please enter old and new password", 400));
         }
-
+      
         const user = await userModel.findById(req.user?._id).select("+password");
 
         if (user?.password === undefined) {

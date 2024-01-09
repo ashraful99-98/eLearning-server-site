@@ -6,6 +6,7 @@ import { addAnswer,
          addReview, 
          deleteCourse, 
          editCourse, 
+         generateVideoUrl, 
          getAllCourses,
          getAllCoursesControl, 
          getCourseByUser, 
@@ -36,6 +37,11 @@ courseRouter.put("/add-reply",isAutheticated, authorizeRoles("admin"),addReplyTo
 courseRouter.get("/get-all-courses",isAutheticated, authorizeRoles("admin"), getAllCoursesControl);
 
 // courseRouter.put("/get-all-courses",isAutheticated, authorizeRoles("admin"), getAllCourses);
+
+courseRouter.post(
+        "/getVdoCipherOTP",
+   generateVideoUrl
+);
 
 courseRouter.delete("/delete-course/:id",isAutheticated, authorizeRoles("admin"), deleteCourse);
 
