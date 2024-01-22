@@ -47,7 +47,7 @@ const layoutSchema = new Schema<Layout>({
     banner:{
         image: bannerImageSchema,
         title: {type:String},
-        subtitle:{type:String}
+        subTitle:{type:String}
     }
 });
 
