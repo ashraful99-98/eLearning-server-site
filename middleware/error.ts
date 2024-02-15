@@ -7,7 +7,7 @@ export const ErrorMiddleware = (
     res:Response,             
     next:NextFunction
 ) => {
-    err.statusCode = err.statusCode || 5000;
+    err.statusCode = err.statusCode || 500;
     err.message || 'Internel server error';
 
     // wrong mongodb id error
@@ -22,14 +22,14 @@ export const ErrorMiddleware = (
     err = new ErrorHandler(message, 400); 
    }
    // wrong jwt error
-   if(err.code === 'JsonWebTokenError'){
+   if(err.name === 'JsonWebTokenError'){
         const message = `Json web token is invalid, try again`;
         err = new ErrorHandler(message, 400); 
         
     }
 
     //JWT expired error
-    if(err.code === 'TokenExpiredError'){
+    if(err.name === 'TokenExpiredError'){
         const message = `Json web token is expired, try again`;
         err = new ErrorHandler(message, 400); 
         

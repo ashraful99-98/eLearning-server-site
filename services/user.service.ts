@@ -19,7 +19,7 @@ export const getUserById = async ( id: string, res: Response) => {
 
 // export const getUserById = (async (id:string, res:Response) => {
 //   const user = await userModel.findById(id);
-//   console.log(user);
+
 
 //   res.status(201).json({
 //     success: true,

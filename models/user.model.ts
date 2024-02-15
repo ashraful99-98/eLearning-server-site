@@ -71,9 +71,9 @@ export const userSchema : Schema<IUser> = new mongoose.Schema({
 },{timestamps:true}); 
 
 //Hash Password before saving 
-userSchema.pre<IUser>('save', async function(next){
+userSchema.pre<IUser>("save", async function(next){
 
-    if(!this.isModified('password')){
+    if(!this.isModified("password")){
        next();
     }
     this.password = await bcrypt.hash(this.password, 10);
@@ -103,3 +103,4 @@ return await bcrypt.compare(enteredPassword, this.password);
 const userModel : Model<IUser> = mongoose.model("User", userSchema);
 
 export default userModel;
+

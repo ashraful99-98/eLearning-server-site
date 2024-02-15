@@ -56,7 +56,7 @@ export const registrationUser = CatchAsyncError(async (req: Request, res: Respon
             });
             res.status(201).json({
                 success: true,
-                message: `Pleasde check your email: ${user.email} to activate your account!`,
+                message: `Please check your email: ${user.email} to activate your account!`,
                 activationToken: activationToken.token,
             });
         } catch (error: any) {
@@ -126,6 +126,7 @@ export const activateUser = CatchAsyncError(async (req: Request, res: Response, 
 
         res.status(201).json({
             success: true,
+            user
         })
 
 
@@ -148,7 +149,7 @@ export const loginUser = CatchAsyncError(async (req: Request, res: Response, nex
             return next(new ErrorHandler("Please enter email and password", 400));
         };
 
-        const user = await userModel.findOne({ email }).select("password");
+        const user = await userModel.findOne({ email }).select("+password");
 
         if (!user) {
             return next(new ErrorHandler("Invalid email or password", 400));
@@ -161,7 +162,6 @@ export const loginUser = CatchAsyncError(async (req: Request, res: Response, nex
         };
 
         sendToken(user, 200, res);
-
 
     } catch (error: any) {
         return next(new ErrorHandler(error.message, 400));
@@ -256,7 +256,7 @@ interface ISocialAuthBody {
     email: string;
     name: string;
     avatar: string;
-}
+} 
 
 export const socialAuth = CatchAsyncError(async ( req: Request,res:Response, next: NextFunction) => {
     try {

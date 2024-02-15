@@ -38,54 +38,105 @@ export const uploadCourse = CatchAsyncError(async(req:Request, res: Response, ne
 
 // edit course
 
-export const editCourse  = CatchAsyncError(async(req:Request, res:Response, next:NextFunction)=>{
-    try{
-        const data = req.body;
+// export const editCourse  = CatchAsyncError(async(req:Request, res:Response, next:NextFunction)=>{
+//     try{
+//         const data = req.body;
 
-        const thumbnail = data.thumbnail;
+//         const thumbnail = data.thumbnail;
 
-        const courseId = req.params.id;
+//         const courseId = req.params.id;
 
-        const courseData = await CourseModel.findById(courseId) as any;
+//         const courseData = await CourseModel.findById(courseId) as any;
 
-        if(thumbnail && !thumbnail.startsWith("https")){
-            await cloudinary.v2.uploader.destroy(thumbnail.public_id);
+//         if(thumbnail && !thumbnail.startsWith("https")){
+//             await cloudinary.v2.uploader.destroy(thumbnail.public_id);
 
-            const myCloud = await cloudinary.v2.uploader.upload(thumbnail,{
-                folder: "courses"
-            });
+//             const myCloud = await cloudinary.v2.uploader.upload(thumbnail,{
+//                 folder: "courses"
+//             });
 
-            data.thumbnail = {
-                public_id :myCloud.public_id,
-                url :myCloud.secure_url,
+//             data.thumbnail = {
+//                 public_id :myCloud.public_id,
+//                 url :myCloud.secure_url,
 
-            }
-        }
+//             }
+//         }
 
-        if(thumbnail.startsWith("https")){
+//         if(thumbnail.startsWith("https")){
             
-            data.thumbnail = {
-            public_id:courseData?.thumbnail.public_id,
-            url:courseData?.thumbnail.url,
-            }
-        }
+//             data.thumbnail = {
+//             public_id:courseData?.thumbnail.public_id,
+//             url:courseData?.thumbnail.url,
+//             }
+//         }
 
     
 
-        const course = await CourseModel.findByIdAndUpdate(courseId,{
-           $set:data},{new: true
+//         const course = await CourseModel.findByIdAndUpdate(courseId,{
+//            $set:data},{new: true
+//         });
+
+//         res.status(200).json({
+//             success :true,
+//             course
+//         })
+
+
+//     }catch(error: any){
+//         return next(new ErrorHandler(error.message, 500));
+//     }
+// });
+
+export const editCourse = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const data = req.body;
+      const thumbnail = data.thumbnail;
+      const courseId = req.params.id;
+  
+      const courseData = await CourseModel.findById(courseId) as any;
+  
+      if (!courseData) {
+        return next(new ErrorHandler('Course not found', 404));
+      }
+  
+      if (thumbnail && !thumbnail.startsWith('https')) {
+        await cloudinary.v2.uploader.destroy(courseData?.thumbnail?.public_id);
+  
+        const myCloud = await cloudinary.v2.uploader.upload(thumbnail, {
+          folder: 'courses',
         });
-
-        res.status(200).json({
-            success :true,
-            course
-        })
-
-
-    }catch(error: any){
-        return next(new ErrorHandler(error.message, 500));
+  
+        data.thumbnail = {
+          public_id: myCloud?.public_id,
+          url: myCloud?.secure_url,
+        };
+      }
+  
+      if (thumbnail?.startsWith('https')) {
+        data.thumbnail = {
+          public_id: courseData?.thumbnail?.public_id,
+          url: courseData?.thumbnail?.url,
+        };
+      }
+  
+      const updatedCourse = await CourseModel.findByIdAndUpdate(
+        courseId,
+        { $set: data },
+        { new: true }
+      );
+  
+      if (!updatedCourse) {
+        return next(new ErrorHandler('Failed to update course', 500));
+      }
+  
+      res.status(200).json({
+        success: true,
+        course: updatedCourse,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 500));
     }
-});
+  });
 
 // get single course --- without purchasing 
 
@@ -274,6 +325,8 @@ export const addAnswer = CatchAsyncError(async(req:Request, res:Response, next:N
         const newAnswer:any ={
             user: req.user,
             answer,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
         }
 
         // add this answer to our course content 
@@ -358,6 +411,8 @@ export const addReview = CatchAsyncError(async(req:Request,res:Response,next:Nex
             user: req.user,
             comment: review,
             rating,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
         }
 
         course?.reviews.push(reviewData);
@@ -373,12 +428,16 @@ export const addReview = CatchAsyncError(async(req:Request,res:Response,next:Nex
 
         await course?.save();
 
-        const notifecation={
-            title: "New Review Received",
-            message: `${req.user?.name} has given a review in ${course?.name}`
-        }
+        await redis.set(courseId, JSON.stringify(course),"EX", 604800);
 
         // create notification 
+        
+        await NotificationModel.create({
+            user:  req.user?._id,
+            title: "New Review Received",
+            message: `${req.user?.name} has given a review in ${course?.name}`
+        });
+
         res.status(200).json({
             success: true,
             course
@@ -420,7 +479,10 @@ export const addReplyToReview = CatchAsyncError(async(req:Request, res:Response,
 
         const replyData:any ={
             user:req.user,
-            comment
+            comment,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+
         }
 
         if(!review.commentReplies){
@@ -430,6 +492,8 @@ export const addReplyToReview = CatchAsyncError(async(req:Request, res:Response,
         review.commentReplies?.push(replyData);
 
         await course?.save();
+
+        await redis.set(courseId, JSON.stringify(course), "EX", 604800);
 
         res.status(200).json({
             success: true,

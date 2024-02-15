@@ -9,7 +9,6 @@ import { addAnswer,
          generateVideoUrl, 
          getAdminAllCourses, 
          getAllCourses,
-      
          getCourseByUser, 
          getSingleCourse, 
          uploadCourse 
@@ -20,7 +19,9 @@ const courseRouter = express.Router();
 
 courseRouter.post("/create-course",updateAccessToken, isAutheticated, authorizeRoles("admin"),uploadCourse);
 
-courseRouter.put("/edit-course/:id",updateAccessToken, isAutheticated, authorizeRoles("admin"),editCourse);
+courseRouter.put("/edit-course/:id",
+updateAccessToken,
+ isAutheticated, authorizeRoles("admin"),editCourse);
 
 courseRouter.get("/get-course/:id", getSingleCourse);
 

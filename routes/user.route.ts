@@ -25,11 +25,12 @@ userRouter.post('/activate-user', activateUser);
 
 userRouter.post('/login', loginUser);
 
-userRouter.get('/refreshtoken', updateAccessToken);
 
-userRouter.get('/logout',updateAccessToken,isAutheticated, logoutUser);
+userRouter.get('/logout',isAutheticated, logoutUser);
 
 userRouter.get('/me',updateAccessToken, isAutheticated, getUserInfo);
+
+userRouter.get('/refreshtoken', updateAccessToken);
 
 userRouter.post('/social-auth', socialAuth);
 
