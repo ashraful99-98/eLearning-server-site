@@ -14,8 +14,7 @@ import analyticsRouter from "./routes/analytics.route";
 
 import layoutRouter from "./routes/layout.route";
 import contactRouter from "./routes/contact.route";
-// import paymentRouter from "./routes/payment.route";
-
+import { rateLimit } from 'express-rate-limit'
 //body parser
 app.use(express.json({ limit: "100mb" }));
 
@@ -30,6 +29,16 @@ app.use(
     credentials: true,
   }),
 );
+
+// api requests lemit 
+const limiter = rateLimit({
+	windowMs: 15 * 60 * 1000, // 15 minutes
+	limit: 100, 
+	standardHeaders: 'draft-7', 
+	legacyHeaders: false,
+});
+
+
 //routes
 app.use("/api/v1", userRouter);
 app.use("/api/v1", courseRouter);
@@ -55,5 +64,7 @@ app.all("*", (req: Request, res: Response, next: NextFunction) => {
   err.statusCode = 404;
   next(err);
 });
+// middleware calls 
+app.use(limiter);
 
 app.use(ErrorMiddleware);

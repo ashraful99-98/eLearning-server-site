@@ -12,6 +12,7 @@ import { sendToken } from "../utils/jwt";
 import { redis } from "../utils/redis";
 import { getAllUsersService, getUserById, updateUserRoleService } from '../services/user.service';
 import cloudinary from "cloudinary";
+import { body, validationResult } from 'express-validator';
 
 
 // register user
@@ -27,11 +28,18 @@ interface IRegistrationBody {
 export const registrationUser = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { name, email, password } = req.body;
+        // const emailRegexPattern: RegExp = /[A-Za-z0-9_+-][A-Za-z0-9_+-]*([.][A-Za-z0-9_+-]+)*@[A-Za-z.-]+"."[A-Za-z]{2,4}/;
+        const emailRegexPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
         const isEmailExist = await userModel.findOne({ email });
+        const userEmailValidate = await userModel.findOne({ email });
+
         if (isEmailExist) {
-            return next(new ErrorHandler("Email already exist", 400))
+            return next(new ErrorHandler("Email already exist", 400));
         };
+        // if (!emailRegexPattern.test(email)) {
+        //     return next(new ErrorHandler("Invalid Email", 400));
+        // }
 
         const user: IRegistrationBody = {
             name,
@@ -85,7 +93,7 @@ export const createActivationToken = (user: any): IActivationToken => {
         },
         process.env.ACTIVATION_SECRET as Secret,
         {
-            expiresIn: '5m',
+            expiresIn: '10m',
         }
     );
 
@@ -212,7 +220,7 @@ export const updateAccessToken = CatchAsyncError(async (req: Request, res: Respo
         const user = JSON.parse(session);
 
         const accessToken = jwt.sign({ id: user._id }, process.env.ACCESS_TOKEN as string, {
-            expiresIn: "5m",
+            expiresIn: "10m",
         });
 
 
